@@ -1,0 +1,55 @@
+# ──────────────────────────
+# Node / Electron
+# ──────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log*
+dist/
+build/
+out/
+*.asar
+
+# ──────────────────────────
+# Python
+# ──────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.egg-info/
+.env
+.venv/
+venv/
+pip-wheel-metadata/
+
+# Herramientas de análisis / pruebas
+.pytest_cache/
+.coverage
+.mypy_cache/
+*.log
+
+# ──────────────────────────
+# Datos generados por la app
+# ──────────────────────────
+backend/respuesta.csv
+*.csv
+*.xlsx
+*.xls
+*.json.bak
+*.zip
+
+# ──────────────────────────
+# IDE / Sistema operativo
+# ──────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ──────────────────────────
+# Power BI u otros binarios pesados (mantén el fuente .pbix si lo necesitas)
+# ──────────────────────────
+*.pbix~
+*.tmp
