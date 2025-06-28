@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="es"><head>
-<meta charset="UTF-8"><title>Clasificador de Comentarios</title>
+<meta charset="UTF-8"><title>Sistema de Categorización de Fortalezas y Oportunidades FCAB</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -8,37 +8,34 @@
       content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;">
 </head><body>
 <header class="app-header">
-  <div class="logo-wrapper"><img src="assets/logo-fcab.svg" alt="FCAB" class="logo"></div>
-  <h1>Clasificador de Comentarios <span class="subtitle">+ Frases Clave</span></h1>
+  <div class="logo-wrapper"><img src="assets/logo-fcab.png" alt="FCAB" class="logo"></div>
   <button id="toggleTheme" class="theme-btn" title="Alternar modo claro / oscuro">🌙</button>
 </header>
 
 <section class="panel">
-  <div class="field">
-    <label for="token">Token HuggingFace</label>
-    <input id="token" type="text" placeholder="hf_..." autocomplete="off">
-  </div>
+  <!--
   <div class="field">
     <label for="ruta">Ruta local o enlace Excel</label>
     <input id="ruta" type="text" placeholder="C:\\archivo.xlsx  o  https://1drv...">
   </div>
+  -->
   <button id="run" class="primary-btn">▶ Ejecutar análisis</button>
   <p id="estado" class="estado"></p>
 </section>
 
 <section class="crud">
-  <h2>✍️ Gestión de frases clave</h2>
-  <div class="crud-columns" style="display:flex;gap:40px;flex-wrap:wrap">
+  <h2 style="margin-top:10px;justify-self:center">Gestión de Categorías</h2>
+  <div class="crud-columns">
     <div class="crud-col">
-      <h3>Fortalezas</h3>
+      <h3 style="margin-top:30px;align-self:center">Fortalezas</h3>
       <ul id="lista-fortalezas" class="lista"></ul>
       <div class="add-row">
-        <input id="nueva-fortaleza" type="text" placeholder="Nueva fortaleza">
+        <input class="text" id="nueva-fortaleza" type="text" placeholder="Nueva fortaleza">
         <button onclick="agregarFrase('Fortalezas')" class="add-btn">Agregar</button>
       </div>
     </div>
     <div class="crud-col">
-      <h3>Debilidades</h3>
+      <h3 style="margin-top:30px;align-self:center">Debilidades</h3>
       <ul id="lista-debilidades" class="lista"></ul>
       <div class="add-row">
         <input id="nueva-debilidad" type="text" placeholder="Nueva debilidad">

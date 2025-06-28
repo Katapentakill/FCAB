@@ -18,6 +18,7 @@ function createWindow () {
   });
 
   win.loadFile('index.html');
+  console.log(window.api);
 }
 
 app.whenReady().then(() => {
