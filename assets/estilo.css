@@ -138,13 +138,15 @@ input[type=text]{
 }
 .lista li{
   display:flex;
-  align-items:center;
+  align-items: center;
   justify-content:space-between;
   padding:8px;
-  border-bottom:1px solid var(--list-border)
+  border-bottom:1px solid var(--list-border);
+  gap: 12px;
 }
 .lista li:last-child{border-bottom:none}
 .lista li button{
+  flex-shrink: 0;
   background:var(--remove-btn);
   color:#ffffff;
   border:none;
@@ -152,6 +154,15 @@ input[type=text]{
   height:28px;
   border-radius:50%;
   cursor:pointer
+}
+.lista li span {
+  flex: 1;
+  display: block;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap; 
+  max-width: 100%;     
+  overflow-wrap: break-word;
 }
 .add-row{display:flex;gap:10px}
 .add-btn{
