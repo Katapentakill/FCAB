@@ -21,5 +21,11 @@
     "pandas": "^0.0.3",
     "requests": "^0.3.0",
     "sys": "^0.0.1"
+  },
+  "build": {
+    "appId": "com.UCN.SCFO.FCAB",
+    "productName": "Clasificador FCAB",
+    "icon": "assets/logo-fcab.png"
   }
+
 }

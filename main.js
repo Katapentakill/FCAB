@@ -8,6 +8,7 @@ function createWindow () {
   const win = new BrowserWindow({
     width : 1000,
     height: 800,
+    icon: path.join(__dirname, 'assets', 'logo-fcab.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -29,7 +30,9 @@ app.whenReady().then(() => {
 
 ipcMain.handle('ejecutar-python', async (_, args) => new Promise((res, rej) => {
   const rutaPython = path.join(__dirname, 'backend', 'main.py');
-  const proc = spawn('python', [rutaPython, args.ruta, args.token]);
+  console.log("Argumentos recibidos:", args)
+  const proc = spawn('python', [rutaPython, args.ruta, args.umbral || '0.25', args.token]);
+
 
   proc.stdout.on('data', d => console.log(d.toString()));
   proc.stderr.on('data', d => console.error(d.toString()));
