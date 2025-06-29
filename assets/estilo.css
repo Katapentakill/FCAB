@@ -7,8 +7,8 @@
   --subtitle: #555;
   --crud: #E6F4F3;
   --crud-border: #7DCAC8;
-  --label: #333;
-  --input: #d2d2d2;
+  --label: #363636;
+  --input: #363636;
   --exe-btn: #e9a63a;
   --add-btn: #48c957;
   --remove-btn: #bb4345;
@@ -17,7 +17,7 @@
 }
 body.dark {
   --fondo: #539BAA;
-  --panel: #f1f1f1;
+  --panel: #363636;
   --panel-border: #5AA5AA;
   --borde: #33373A;
   --texto: #ffffff;

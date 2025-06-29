@@ -84,3 +84,16 @@ if(themeBtn){
     themeBtn.textContent = modo==='dark'?'☀️':'🌙';
   });
 }
+
+// Eventos para agregar frases sin usar inline JS
+window.addEventListener('DOMContentLoaded', () => {
+  const btnFortaleza = document.getElementById('btn-fortaleza');
+  const btnDebilidad = document.getElementById('btn-debilidad');
+
+  if (btnFortaleza)
+    btnFortaleza.addEventListener('click', () => agregarFrase('Fortalezas'));
+
+  if (btnDebilidad)
+    btnDebilidad.addEventListener('click', () => agregarFrase('Debilidades'));
+});
+
