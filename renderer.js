@@ -8,17 +8,17 @@ document.getElementById('run').addEventListener('click', async () => {
   const ruta = window.api?.ONEDRIVE_URL;
   const token = window.api?.TOKEN;
   if (!ruta || !token) {
-      estado.innerText = '❌ Faltan valores en .env (ruta o token).';
+      mostrarPopup('❌ Faltan valores en .env (ruta o token).');
       return;
   }
-  estado.innerText = ' Ejecutando…';
+  mostrarPopup('⏳ Ejecutando…');
 
   try {
     const msg = await window.api.ejecutarPython({ ruta, token });
-    estado.innerText = msg;
+    mostrarPopup(`✅ ${msg}`);
   } catch (err) {
     console.error(err);
-    estado.innerText = '❌ Error al ejecutar.';
+    mostrarPopup('❌ Error al ejecutar.');
   }
 });
 
@@ -96,4 +96,16 @@ window.addEventListener('DOMContentLoaded', () => {
   if (btnDebilidad)
     btnDebilidad.addEventListener('click', () => agregarFrase('Debilidades'));
 });
+
+function mostrarPopup(mensaje, tiempo = 3000) {
+  const popup = document.getElementById('popup');
+  popup.textContent = mensaje;
+  popup.classList.remove('hidden');
+  popup.classList.add('show');
+
+  setTimeout(() => {
+    popup.classList.remove('show');
+    setTimeout(() => popup.classList.add('hidden'), 300); // espera a que termine el fade-out
+  }, tiempo);
+}
 

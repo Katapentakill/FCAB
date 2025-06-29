@@ -173,3 +173,28 @@ input[type=text]{
   border-radius:6px;
   cursor:pointer
 }
+.popup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--panel);
+  color: var(--texto);
+  border: 2px solid var(--borde);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-weight: 600;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  display: none;
+}
