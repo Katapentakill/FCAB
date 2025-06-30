@@ -1,54 +1,23 @@
-import os, sys, json, requests, pandas as pd
-from io import BytesIO
+import os, sys, json
+import pandas as pd
+from io import BytesIO, StringIO
 from sentence_transformers import SentenceTransformer, util
 from huggingface_hub import login
 from dotenv import load_dotenv
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
+# 🔐 Cargar variables del entorno
 load_dotenv()
 
-# 💡 Enlace directo (OneDrive) permitido
-ONEDRIVE_URL = os.getenv("ONEDRIVE_URL")
-if not ONEDRIVE_URL:
-    raise ValueError("Falta ONEDRIVE_URL en el archivo .env")
+# SharePoint
+site_url = os.getenv("SHAREPOINT_SITE_URL")
+username = os.getenv("SHAREPOINT_USERNAME")
+password = os.getenv("SHAREPOINT_PASSWORD")
+relative_url = os.getenv("SHAREPOINT_RELATIVE_URL")  # archivo origen
+target_folder_url = os.getenv("SHAREPOINT_TARGET_FOLDER")  # carpeta destino
 
-def resolver_onedrive(url: str) -> str:
-    """Convierte un enlace de 1drv.ms en uno directo de descarga"""
-    r = requests.head(url, allow_redirects=True)
-    direct_url = r.url
-    if "redir" not in direct_url:
-        raise ValueError("No se pudo resolver el enlace de OneDrive.")
-    # Cambiar el parámetro para forzar descarga
-    return direct_url.replace("redir?", "download?")
-
-def descargar_excel(url: str) -> BytesIO:
-    if "1drv.ms" in url:
-        url = resolver_onedrive(url)
-    if "download=1" not in url:
-        raise ValueError("El enlace debe terminar en un link de descarga directa")
-    r = requests.get(url)
-    r.raise_for_status()
-    return BytesIO(r.content)
-
-def leer_excel(src: str) -> pd.DataFrame:
-    stream = descargar_excel(src) if src.startswith("http") else src
-    if not src.startswith("http") and not os.path.exists(stream):
-        raise FileNotFoundError("Excel no encontrado")
-    return pd.ExcelFile(stream).parse("Sheet1")
-
-# 🧾 Argumentos: ninguno requerido para ruta, ya que se fija el enlace
-if len(sys.argv) < 2:
-    print("Uso: python main.py <token> [umbral]")
-    sys.exit(1)
-
-token = os.getenv("TOKEN")
-token = sys.argv[1]
-UMBRAL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.25
-login(token=token)
-
-# 👉 Siempre se usa el enlace de OneDrive
-df = leer_excel(ONEDRIVE_URL)
-
-# 💬 Columnas esperadas
+# Columnas esperadas
 COL_ID = os.getenv("COL_ID")
 COL_FORT = os.getenv("COL_FORT")
 COL_OPOR = os.getenv("COL_OPOR")
@@ -58,24 +27,64 @@ COL_GER = os.getenv("COL_GER")
 COL_DEP = os.getenv("COL_DEP")
 COL_ROL = os.getenv("COL_ROL")
 
+# Validación de argumentos
+if len(sys.argv) < 2:
+    print("Uso: python main.py <token> [umbral]")
+    sys.exit(1)
+
+token = sys.argv[1]
+UMBRAL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.25
+login(token=token)
+
+# 📥 Leer archivo CSV desde SharePoint
+def leer_csv_sharepoint():
+    ctx_auth = AuthenticationContext(site_url)
+    if not ctx_auth.acquire_token_for_user(username, password):
+        raise Exception("Error de autenticación con SharePoint")
+
+    ctx = ClientContext(site_url, ctx_auth)
+
+    file = BytesIO()
+    ctx.web.get_file_by_server_relative_url(relative_url).download(file).execute_query()
+    file.seek(0)
+
+    df = pd.read_csv(file)
+    return df
+# 📤 Subir archivo CSV a SharePoint
+def subir_csv_sharepoint(df: pd.DataFrame, nombre_archivo: str):
+    ctx_auth = AuthenticationContext(site_url)
+    if not ctx_auth.acquire_token_for_user(username, password):
+        raise Exception("Autenticación con SharePoint fallida")
+
+    ctx = ClientContext(site_url, ctx_auth)
+    csv_buffer = BytesIO()
+    df.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+    csv_buffer.seek(0)
+    ctx.web.get_folder_by_server_relative_url(target_folder_url)\
+        .upload_file(nombre_archivo, csv_buffer.read()).execute_query()
+    print(f" '{nombre_archivo}' subido correctamente a SharePoint.")
+
+# ▶️ Proceso principal
+df = leer_csv_sharepoint()
+
 res, tipos, foros, fechas, ids, gers, deps, roles = ([] for _ in range(8))
-
 for _, row in df.iterrows():
-    if pd.notna(row[COL_FORT]) and len(str(row[COL_FORT]).strip()) >= 6:
-        res.append(str(row[COL_FORT]).strip()); tipos.append("Fortaleza")
-    if pd.notna(row[COL_OPOR]) and len(str(row[COL_OPOR]).strip()) >= 6:
-        res.append(str(row[COL_OPOR]).strip()); tipos.append("Oportunidad")
-    if tipos and len(tipos) == len(res):
-        foros.append(row[COL_FORO]); fechas.append(row[COL_FECHA])
-        ids.append(row[COL_ID]); gers.append(row[COL_GER])
-        deps.append(row[COL_DEP]); roles.append(row[COL_ROL])
+    for tipo, columna in [("Fortaleza", COL_FORT), ("Oportunidad", COL_OPOR)]:
+        if pd.notna(row[columna]) and len(str(row[columna]).strip()) >= 6:
+            res.append(str(row[columna]).strip())
+            tipos.append(tipo)
+            ids.append(row[COL_ID])
+            foros.append(row[COL_FORO])
+            gers.append(row[COL_GER])
+            deps.append(row[COL_DEP])
+            roles.append(row[COL_ROL])
+            fechas.append(row[COL_FECHA])
 
-# 📚 Cargar frases clave
+# 🧠 Clasificación semántica
 with open("backend/frases_clave.json", encoding="utf-8") as f:
     data = json.load(f)
 temas = list(set(data["Fortalezas"] + data["Debilidades"]))
 
-# 🔍 Modelo y clasificación
 model = SentenceTransformer("distiluse-base-multilingual-cased-v1")
 temas_emb = model.encode(temas, normalize_embeddings=True)
 
@@ -87,11 +96,16 @@ def asignar(txt):
 
 cats = [asignar(t) for t in res]
 
-# 💾 Guardar CSV de resultados
-pd.DataFrame({
-  "ID": ids, "respuesta": res, "foro": foros, "gerencia_observador": gers,
-  "departamento": deps, "rol_observador": roles, "fecha": fechas,
-  "tipo": tipos, "categoria_asignada": cats
-}).to_csv("respuesta.csv", index=False, encoding="utf-8-sig")
+# 💾 Guardar resultado
+df_resultado = pd.DataFrame({
+    "ID": ids, "respuesta": res, "foro": foros, "gerencia_observador": gers,
+    "departamento": deps, "rol_observador": roles, "fecha": fechas,
+    "tipo": tipos, "categoria_asignada": cats
+})
 
-print("✅ respuesta.csv generado con éxito")
+nombre_csv = "respuesta.csv"
+df_resultado.to_csv(nombre_csv, index=False, encoding="utf-8-sig")
+print("respuesta.csv generado con éxito")
+
+# 🔼 Subida final
+subir_csv_sharepoint(df_resultado, nombre_csv)

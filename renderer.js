@@ -4,17 +4,15 @@ console.log('🛠 Ruta JSON usada:', rutaJson);
 
 /* ---------- Botón Ejecutar análisis ---------- */
 document.getElementById('run').addEventListener('click', async () => {
-  const estado = document.getElementById('estado');
-  const ruta = window.api?.ONEDRIVE_URL;
   const token = window.api?.TOKEN;
-  if (!ruta || !token) {
-      mostrarPopup('❌ Faltan valores en .env (ruta o token).');
+  if (!token) {
+      mostrarPopup('❌ Faltan valores en .env (token).');
       return;
   }
   mostrarPopup('⏳ Ejecutando…');
 
   try {
-    const msg = await window.api.ejecutarPython({ ruta, token });
+    const msg = await window.api.ejecutarPython({ token });
     mostrarPopup(`✅ ${msg}`);
   } catch (err) {
     console.error(err);

@@ -31,7 +31,7 @@ app.whenReady().then(() => {
 ipcMain.handle('ejecutar-python', async (_, args) => new Promise((res, rej) => {
   const rutaPython = path.join(__dirname, 'backend', 'main.py');
   console.log("Argumentos recibidos:", args)
-  const proc = spawn('python', [rutaPython, args.ruta, args.umbral || '0.25', args.token]);
+  const proc = spawn('python', [rutaPython, args.token]);
 
 
   proc.stdout.on('data', d => console.log(d.toString()));
