@@ -51,6 +51,7 @@ function agregarFrase (tipo) {
   data[tipo].push(frase);
   window.fs.writeFileSync(rutaJson,JSON.stringify(data,null,2),'utf-8');
   input.value=''; cargarFrases();
+  mostrarPopup('✅ Categoría añadida correctamente.');
 }
 
 function eliminarFrase (tipo,idx){
@@ -58,6 +59,7 @@ function eliminarFrase (tipo,idx){
   data[tipo].splice(idx,1);
   window.fs.writeFileSync(rutaJson,JSON.stringify(data,null,2),'utf-8');
   cargarFrases();
+  mostrarPopup('✅ Categoría eliminada correctamente.');
 }
 
 function actualizarFrase (tipo,idx,nuevo){
@@ -66,6 +68,7 @@ function actualizarFrase (tipo,idx,nuevo){
   if(!limpio || data[tipo].includes(limpio)){cargarFrases(); return;}
   data[tipo][idx]=limpio;
   window.fs.writeFileSync(rutaJson,JSON.stringify(data,null,2),'utf-8');
+  mostrarPopup('✅ Categoría actualizada correctamente.');
 }
 
 window.addEventListener('DOMContentLoaded', cargarFrases);
@@ -103,7 +106,45 @@ function mostrarPopup(mensaje, tiempo = 3000) {
 
   setTimeout(() => {
     popup.classList.remove('show');
-    setTimeout(() => popup.classList.add('hidden'), 300); // espera a que termine el fade-out
+    setTimeout(() => popup.classList.add('hidden'), 300);
   }, tiempo);
 }
+
+//--- MODAL ---
+const btnConfig = document.getElementById('btn-config');
+const modal = document.getElementById('config-modal');
+const cerrar = document.getElementById('cerrar-modal');
+const guardar = document.getElementById('guardar-config');
+
+// Abrir modal y precargar valores
+btnConfig.addEventListener('click', async () => {
+  const env = await window.api.obtenerEnv();
+  document.getElementById('siteUrl').value      = env.SHAREPOINT_SITE_URL || '';
+  document.getElementById('username').value     = env.SHAREPOINT_USERNAME || '';
+  document.getElementById('password').value     = env.SHAREPOINT_PASSWORD || '';
+  document.getElementById('relativeUrl').value  = env.SHAREPOINT_RELATIVE_URL || '';
+  document.getElementById('targetFolder').value = env.SHAREPOINT_TARGET_FOLDER || '';
+  modal.classList.remove('hidden');
+});
+
+cerrar.addEventListener('click', () => modal.classList.add('hidden'));
+
+// Guardar .env actualizado
+guardar.addEventListener('click', async () => {
+  const nuevosValores = {
+    SHAREPOINT_SITE_URL:      document.getElementById('siteUrl').value.trim(),
+    SHAREPOINT_USERNAME:      document.getElementById('username').value.trim(),
+    SHAREPOINT_PASSWORD:      document.getElementById('password').value.trim(),
+    SHAREPOINT_RELATIVE_URL:  document.getElementById('relativeUrl').value.trim(),
+    SHAREPOINT_TARGET_FOLDER: document.getElementById('targetFolder').value.trim(),
+  };
+
+  const ok = await window.api.guardarEnv(nuevosValores);
+  if (ok) {
+    mostrarPopup('✅ Configuración guardada correctamente.');
+    modal.classList.add('hidden');
+  } else {
+    mostrarPopup('❌ Error al guardar la configuración.');
+  }
+});
 
