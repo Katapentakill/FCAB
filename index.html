@@ -9,16 +9,39 @@
 </head><body>
 <header class="app-header">
   <div class="logo-wrapper"><img src="assets/logo-fcab.png" alt="FCAB" class="logo"></div>
-  <button id="toggleTheme" class="theme-btn" title="Alternar modo claro / oscuro">🌙</button>
+  <div style="display: flex; gap: 10px;">
+    <button id="btn-config" class="theme-btn" title="Configuración">⚙️</button>
+    <button id="toggleTheme" class="theme-btn" title="Alternar modo claro / oscuro">🌙</button>
+  </div>
 </header>
 
-<section class="panel">
-  <!--
-  <div class="field">
-    <label for="ruta">Ruta local o enlace Excel</label>
-    <input id="ruta" type="text" placeholder="C:\\archivo.xlsx  o  https://1drv...">
+<div id="config-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2 style="align-self: center">Configuración</h2>
+
+    <label for="siteUrl">🔗 URL SharePoint</label>
+    <input type="text" id="siteUrl">
+
+    <label for="username">👤 Usuario</label>
+    <input type="text" id="username">
+
+    <label for="password">🔒 Contraseña</label>
+    <input type="password" id="password">
+
+    <label for="relativeUrl">📄 Ruta Archivo Formularios</label>
+    <input type="text" id="relativeUrl">
+
+    <label for="targetFolder">📁 Ruta Destino</label>
+    <input type="text" id="targetFolder">
+
+    <div style="display:flex; justify-content: space-between; gap:10px;">
+      <button id="guardar-config" class="save-btn">💾 Guardar</button>
+      <button id="cerrar-modal" class="close-btn">Cancelar</button>
+    </div>
   </div>
-  -->
+</div>
+
+<section class="panel">
   <button id="run" class="primary-btn">▶ Ejecutar análisis</button>
   <p id="estado" class="estado"></p>
 </section>

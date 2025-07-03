@@ -11,8 +11,9 @@ const rutaJson = arg
 /* API segura para el renderer */
 contextBridge.exposeInMainWorld('api', {
   ejecutarPython: (args) => ipcRenderer.invoke('ejecutar-python', args),
+  obtenerEnv: () => ipcRenderer.invoke('obtener-env'),
+  guardarEnv: (data) => ipcRenderer.invoke('guardar-env', data),
   rutaJson,
-  ONEDRIVE_URL: process.env.ONEDRIVE_URL,
   TOKEN: process.env.TOKEN,
   COL_ID: process.env.COL_ID,
   COL_FORT: process.env.COL_FORT,

@@ -14,6 +14,8 @@
   --remove-btn: #bb4345;
   --list: #539BAA;
   --list-border: #539BAA;
+  --save-btn: #6774e8;
+  --close-btn: #dd5254;
 }
 body.dark {
   --fondo: #539BAA;
@@ -31,6 +33,8 @@ body.dark {
   --remove-btn: #AC3D3F;
   --list: #A6E0DE;
   --list-border: #A6E0DE;
+  --save-btn: #454e9e;
+  --close-btn: #9b3a3c;
 }
 
 *{
@@ -118,6 +122,14 @@ input[type=text]{
   background:var(--panel);
   color:var(--texto)
 }
+input[type=password]{
+  width:100%;
+  padding:10px;
+  border:2px solid var(--input);
+  border-radius:6px;
+  background:var(--panel);
+  color:var(--texto)
+}
 .primary-btn{
   background:var(--exe-btn);
   color:#fff;
@@ -197,4 +209,45 @@ input[type=text]{
 
 .hidden {
   display: none;
+}
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+}
+.modal-content {
+  background: var(--crud);
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal.hidden { display: none; }
+.modal input {
+  padding: 8px;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+}
+.save-btn{
+  background:var(--save-btn);
+  color:#fff;
+  border:none;
+  padding:10px 20px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+}
+.close-btn{
+  background:var(--close-btn);
+  color:#fff;
+  border:none;
+  padding:10px 20px;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
 }
