@@ -37,7 +37,7 @@ UMBRAL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.25
 login(token=token)
 
 # 📥 Leer archivo CSV desde SharePoint
-def leer_csv_sharepoint():
+def leer_archivo_sharepoint():
     ctx_auth = AuthenticationContext(site_url)
     if not ctx_auth.acquire_token_for_user(username, password):
         raise Exception("Error de autenticación con SharePoint")
@@ -48,24 +48,37 @@ def leer_csv_sharepoint():
     ctx.web.get_file_by_server_relative_url(relative_url).download(file).execute_query()
     file.seek(0)
 
-    df = pd.read_csv(file)
+    # Guardar para inspección si se desea
+    with open("archivo_temporal.descargado", "wb") as debug:
+        debug.write(file.getvalue())
+
+    # Intentar como Excel
+    try:
+        df = pd.read_excel(file, engine='openpyxl')
+        print("Archivo leído como Excel (.xlsx)")
+    except Exception as e:
+        print(f"Falló como Excel, intentando como CSV. Detalle: {e}")
+        file.seek(0)
+        df = pd.read_csv(file, encoding="utf-8")
+        print("Archivo leído como CSV")
+
     return df
 # 📤 Subir archivo CSV a SharePoint
-def subir_csv_sharepoint(df: pd.DataFrame, nombre_archivo: str):
+def subir_excel_sharepoint(df: pd.DataFrame, nombre_archivo: str):
     ctx_auth = AuthenticationContext(site_url)
     if not ctx_auth.acquire_token_for_user(username, password):
         raise Exception("Autenticación con SharePoint fallida")
 
     ctx = ClientContext(site_url, ctx_auth)
-    csv_buffer = BytesIO()
-    df.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-    csv_buffer.seek(0)
+    excel_buffer = BytesIO()
+    df.to_excel(excel_buffer, index=False)
+    excel_buffer.seek(0)
     ctx.web.get_folder_by_server_relative_url(target_folder_url)\
-        .upload_file(nombre_archivo, csv_buffer.read()).execute_query()
+        .upload_file(nombre_archivo, excel_buffer.read()).execute_query()
     print(f" '{nombre_archivo}' subido correctamente a SharePoint.")
 
 # ▶️ Proceso principal
-df = leer_csv_sharepoint()
+df = leer_archivo_sharepoint()
 
 res, tipos, foros, fechas, ids, gers, deps, roles = ([] for _ in range(8))
 for _, row in df.iterrows():
@@ -103,9 +116,9 @@ df_resultado = pd.DataFrame({
     "tipo": tipos, "categoria_asignada": cats
 })
 
-nombre_csv = "respuesta.csv"
-df_resultado.to_csv(nombre_csv, index=False, encoding="utf-8-sig")
-print("respuesta.csv generado con éxito")
+nombre_excel = "Respuestas_Analisis.xlsx"
+df_resultado.to_csv(nombre_excel, index=False, encoding="utf-8-sig")
+print("Archivo generado con éxito")
 
 # 🔼 Subida final
-subir_csv_sharepoint(df_resultado, nombre_csv)
+subir_excel_sharepoint(df_resultado, nombre_excel)
