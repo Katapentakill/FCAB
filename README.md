@@ -30,17 +30,17 @@ Debes crear un archivo `.env` en la raíz del proyecto con las siguientes variab
 
 ```env
 # SharePoint
-SHAREPOINT_SITE_URL=
-SHAREPOINT_USERNAME=
-SHAREPOINT_PASSWORD=
-SHAREPOINT_RELATIVE_URL=
-SHAREPOINT_TARGET_FOLDER=
+SHAREPOINT_SITE_URL=https://<tenant>.sharepoint.com/sites/FCABPrueba
+SHAREPOINT_USERNAME=usuario@empresa.com
+SHAREPOINT_PASSWORD=contraseña_o_app_password
+SHAREPOINT_RELATIVE_URL=/sites/FCABPrueba/Shared Documents/Formulario.xlsx
+SHAREPOINT_TARGET_FOLDER=/sites/FCABPrueba/Shared Documents/
 
 # Hugging Face
-TOKEN=
+TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Columnas del Excel (no modificar si tu archivo ya tiene estos nombres)
-COL_ID=ID
+# Columnas del Excel
+COL_ID=Id
 COL_FORT=Fortalezas
 COL_OPOR=Oportunidades
 COL_FORO=Nombre del foro observado
@@ -80,7 +80,6 @@ Debes contar con acceso a un sitio SharePoint Online. Para obtener los datos:
 ```env
 TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
-
 Este token permite a la app usar modelos NLP alojados en Hugging Face para analizar textos.
 
 ---
