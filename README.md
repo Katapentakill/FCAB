@@ -8,8 +8,8 @@ Aplicación de escritorio desarrollada en **Electron** para analizar comentarios
 
 1. Clona este repositorio:
    ```bash
-   git clone https://github.com/tuusuario/tu-repo.git
-   cd tu-repo
+   git clone https://github.com/Katapentakill/FCAB.git
+   cd FCAB
    ```
 
 2. Instala las dependencias:
